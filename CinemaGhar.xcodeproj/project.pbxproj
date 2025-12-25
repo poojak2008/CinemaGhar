@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		767F1E5D2EFBC4D40000919F /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 767F1E5C2EFBC4D40000919F /* SDWebImage */; };
+		767F1E5F2EFBC4D40000919F /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 767F1E5E2EFBC4D40000919F /* SDWebImageMapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		762DA9542EE842CC00BACFAD /* CinemaGhar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CinemaGhar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				767F1E5F2EFBC4D40000919F /* SDWebImageMapKit in Frameworks */,
+				767F1E5D2EFBC4D40000919F /* SDWebImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = CinemaGhar;
 			packageProductDependencies = (
+				767F1E5C2EFBC4D40000919F /* SDWebImage */,
+				767F1E5E2EFBC4D40000919F /* SDWebImageMapKit */,
 			);
 			productName = CinemaGhar;
 			productReference = 762DA9542EE842CC00BACFAD /* CinemaGhar.app */;
@@ -107,6 +116,9 @@
 			);
 			mainGroup = 762DA94B2EE842CC00BACFAD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				767F1E5B2EFBC4D40000919F /* XCRemoteSwiftPackageReference "SDWebImage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 762DA9552EE842CC00BACFAD /* Products */;
 			projectDirPath = "";
@@ -149,7 +161,6 @@
 				INFOPLIST_FILE = CinemaGhar/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -176,7 +187,6 @@
 				INFOPLIST_FILE = CinemaGhar/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -333,6 +343,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		767F1E5B2EFBC4D40000919F /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.21.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		767F1E5C2EFBC4D40000919F /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 767F1E5B2EFBC4D40000919F /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		767F1E5E2EFBC4D40000919F /* SDWebImageMapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 767F1E5B2EFBC4D40000919F /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImageMapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 762DA94C2EE842CC00BACFAD /* Project object */;
 }
