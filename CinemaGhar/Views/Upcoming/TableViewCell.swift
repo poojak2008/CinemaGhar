@@ -1,13 +1,13 @@
 //
-//  CollectionViewTableViewCell.swift
+//  TableViewCell.swift
 //  CinemaGhar
 //
-//  Created by pooja kamble on 10/12/25.
+//  Created by pooja kamble on 24/12/25.
 //
 
 import UIKit
 
-class CollectionViewTableViewCell: UITableViewCell {
+class TableViewCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
