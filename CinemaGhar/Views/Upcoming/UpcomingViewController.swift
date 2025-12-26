@@ -10,9 +10,12 @@ import UIKit
 class UpcomingViewController: UIViewController {
 
     var titles : [Titles] = [Titles]()
+    
+    
+    
     private let upcomingTable : UITableView = {
         let table = UITableView()
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        table.register(UpcomingTableViewCell.self, forCellReuseIdentifier: UpcomingTableViewCell.identifier)
         return table
     }()
     override func viewDidLoad() {
@@ -56,13 +59,18 @@ extension UpcomingViewController : UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = titles[indexPath.row].original_title ?? titles[indexPath.row].original_name ?? "Unkown"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: UpcomingTableViewCell.identifier, for: indexPath) as? UpcomingTableViewCell else{
+            return UITableViewCell()
+        }
+        let title = titles[indexPath.row]
+        cell.configure(with: TitleViewModel(title: title.original_title ?? "Unown" , posterURL: title.poster_path!))
         return cell
     }
     
     
 }
 extension UpcomingViewController : UITableViewDelegate{
-    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 140
+    }
 }

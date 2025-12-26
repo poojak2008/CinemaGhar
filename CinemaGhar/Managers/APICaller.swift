@@ -10,6 +10,8 @@ import Foundation
 struct Constant {
     static let API_Key = "6f491cae4b1d6af610dd62264b286dff"
     static let baseURL = "https://api.themoviedb.org"
+    static let YoutubeAPI_KEY = "AIzaSyBySoAeVL8uyUm-ZIS7Qb7fN-0Ucyp36JI"
+    static let YouTubebseURL = "https://youtube.googleapis.com/youtube/v3/search?"
 }
 
 enum APIError : Error {
@@ -62,7 +64,7 @@ class APICaller {
                 completion(.failure(APIError.failedToGetData))
             }
         }
-            dataTask.resume()
+        dataTask.resume()
     }
     
     func getUpComingMovies(completion: @escaping(Result<[Titles],Error>)-> Void){
@@ -106,7 +108,7 @@ class APICaller {
             }
         }
         dataTask.resume()
-
+        
     }
     
     func getTopRated(completion: @escaping(Result<[Titles],Error>)-> Void){
@@ -129,8 +131,81 @@ class APICaller {
             }
         }
         dataTask.resume()
-
+        
     }
+    
+    
+    func getDiscoverMovies(completion: @escaping(Result<[Titles],Error>)-> Void){
+        guard let url = URL(string: "\(Constant.baseURL)/3/discover/movie?api_key=\(Constant.API_Key)&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate") else { return }
+        
+        let dataTask = URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data = data, error == nil else{
+                return
+            }
+            
+            do {
+                
+                let result = try JSONDecoder().decode(TrendingTitlesResponse.self, from: data)
+                completion(.success(result.results))
+            }
+            catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        dataTask.resume()
+        
+    }
+    
+    
+    func search(with query: String ,completion: @escaping(Result<[Titles],Error>)-> Void){
+        
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return  }
+        guard let url = URL(string: "\(Constant.baseURL)/3/search/movie?api_key=\(Constant.API_Key)&query=\(query)") else {
+            return
+        }
+        
+        let dataTask = URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data = data, error == nil else{
+                return
+            }
+            
+            do {
+                
+                let result = try JSONDecoder().decode(TrendingTitlesResponse.self, from: data)
+                completion(.success(result.results))
+            }
+            catch {
+                completion(.failure(APIError.failedToGetData))
+            }
+        }
+        dataTask.resume()
+        
+    }
+    //q=harry&key=[YOUR_API_KEY]
+    func getMoviesTrailer(with query: String ,completion: @escaping(Result<VideoElement,Error>)-> Void){
+        
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return  }
+        guard let url = URL(string: "\(Constant.YouTubebseURL)q=\(query)&key=\(Constant.YoutubeAPI_KEY)") else {
+            return
+        }
+        
+        let dataTask = URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data = data, error == nil else{
+                return
+            }
+            
+            do {
+                let result = try JSONDecoder().decode(YoutubeSearchResponse.self, from: data)
+                completion(.success(result.items[0]))
+           
+            }
+            catch {
+                completion(.failure(error))
+                print(error.localizedDescription)
+            }
+            
+        }
+        dataTask.resume()
+    }
+    
 }
-
- 

@@ -36,6 +36,7 @@ class HomeViewController: UIViewController {
         let hederView = HeroHederUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = hederView
         
+        navigationController?.pushViewController(TitlePreviewViewController(), animated: true)
         
     }
     override func viewDidLayoutSubviews() {
