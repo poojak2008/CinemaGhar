@@ -7,11 +7,17 @@
 
 import UIKit
 
+protocol CollectionViewTableViewCellDelegates: AnyObject {
+    func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel)
+}
 class CollectionViewTableViewCell: UITableViewCell {
 
     static let identifier = "CollectionViewTableViewCell"
     
+    weak var delegate: CollectionViewTableViewCellDelegates?
+    
     private var title : [Titles] = [Titles]()
+    
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 140, height: 200)
@@ -66,23 +72,33 @@ extension CollectionViewTableViewCell: UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        let title = title[indexPath.row]
-        guard let titleName = title.original_name ?? title.original_title   else{
-          return
+        
+        let selectedTitle = title[indexPath.row]
+        
+        guard let titleName = selectedTitle.original_title ?? selectedTitle.original_name else {
+            return
         }
-        APICaller.shared.getMoviesTrailer(with: titleName + "Trailer") { result in
+        
+        APICaller.shared.getMoviesTrailer(with: titleName + " trailer") { [weak self] result in
+            
             switch result {
             case .success(let videoElement):
-                print(videoElement.id)
-            
+                
+                let title = self?.title[indexPath.row]
+                                guard let titleOverview = title?.overview else {
+                                    return
+                                }
+                                guard let strongSelf = self else {
+                                    return
+                                }
+                                let viewModel = TitlePreviewViewModel(title: titleName, youtubeView: videoElement, titleOverview: titleOverview)
+                                self?.delegate?.collectionViewTableViewCellDidTapCell(strongSelf, viewModel: viewModel)
+                
             case .failure(let error):
                 print(error.localizedDescription)
             }
-            
         }
     }
-    
-    
 }
 extension CollectionViewTableViewCell: UICollectionViewDelegate{
     

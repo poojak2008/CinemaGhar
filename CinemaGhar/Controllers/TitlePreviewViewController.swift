@@ -6,91 +6,83 @@
 //
 
 import UIKit
-import WebKit
-
+import YouTubeiOSPlayerHelper
 class TitlePreviewViewController: UIViewController {
 
-    
+    private let playerView: YTPlayerView = {
+        let view = YTPlayerView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     private let titleLabel: UILabel = {
-           
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.font = .systemFont(ofSize: 22, weight: .bold)
-            label.text = "Harry potter"
-            return label
-        }()
-        
-        private let overviewLabel: UILabel = {
-           
-            let label = UILabel()
-            label.font = .systemFont(ofSize: 18, weight: .regular)
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = 0
-            label.text = "This is the best movie ever to watch as a kid!"
-            return label
-        }()
-        
-        private let downloadButton: UIButton = {
-           
-            let button = UIButton()
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.backgroundColor = .red
-            button.setTitle("Download", for: .normal)
-            button.setTitleColor(.white, for: .normal)
-            button.layer.cornerRadius = 8
-            button.layer.masksToBounds = true
-            
-            return button
-        }()
-        
-        private let webView: WKWebView = {
-            let webView = WKWebView()
-            webView.translatesAutoresizingMaskIntoConstraints = false
-            return webView
-        }()
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 22, weight: .bold)
+        return label
+    }()
+
+    private let overviewLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        return label
+    }()
+
+    private let downloadButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .red
+        button.setTitle("Download", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        return button
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        view.addSubview(webView)
+
+        view.addSubview(playerView)
         view.addSubview(titleLabel)
         view.addSubview(overviewLabel)
         view.addSubview(downloadButton)
-        configureConstraints()
-       
-    }
-    func configureConstraints() {
-            let webViewConstraints = [
-                webView.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
-                webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                webView.heightAnchor.constraint(equalToConstant: 300)
-            ]
-            
-            let titleLabelConstraints = [
-                titleLabel.topAnchor.constraint(equalTo: webView.bottomAnchor, constant: 20),
-                titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            ]
-            
-            let overviewLabelConstraints = [
-                overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
-                overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-            ]
-            
-            let downloadButtonConstraints = [
-                downloadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                downloadButton.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 25),
-                downloadButton.widthAnchor.constraint(equalToConstant: 140),
-                downloadButton.heightAnchor.constraint(equalToConstant: 40)
-            ]
-            
-            NSLayoutConstraint.activate(webViewConstraints)
-            NSLayoutConstraint.activate(titleLabelConstraints)
-            NSLayoutConstraint.activate(overviewLabelConstraints)
-            NSLayoutConstraint.activate(downloadButtonConstraints)
-            
-        }
 
-    
+        configureConstraints()
+    }
+
+    private func configureConstraints() {
+        NSLayoutConstraint.activate([
+            playerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            playerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            playerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            playerView.heightAnchor.constraint(equalToConstant: 300),
+
+            titleLabel.topAnchor.constraint(equalTo: playerView.bottomAnchor, constant: 20),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+
+            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
+            overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+            downloadButton.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 25),
+            downloadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            downloadButton.widthAnchor.constraint(equalToConstant: 140),
+            downloadButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+    }
+
+    func configure(with model: TitlePreviewViewModel) {
+        titleLabel.text = model.title
+        overviewLabel.text = model.titleOverview
+
+        let videoId = model.youtubeView.id.videoId
+
+        playerView.load(withVideoId: videoId, playerVars: [
+            "playsinline": 1,
+            "autoplay": 1,
+            "controls": 1
+        ])
+    }
 }
