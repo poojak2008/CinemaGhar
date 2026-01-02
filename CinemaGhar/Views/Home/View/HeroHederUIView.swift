@@ -79,8 +79,6 @@ class HeroHederUIView: UIView {
         super.layoutSubviews()
         heroImageView.frame = bounds
         
-       
-        
         
     }
     

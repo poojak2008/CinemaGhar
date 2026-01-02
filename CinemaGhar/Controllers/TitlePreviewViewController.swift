@@ -77,12 +77,15 @@ class TitlePreviewViewController: UIViewController {
         titleLabel.text = model.title
         overviewLabel.text = model.titleOverview
 
-        let videoId = model.youtubeView.id.videoId
+        guard let videoId = model.youtubeView.id.videoId else {
+            print("❌ videoId missing")
+            return
+        }
 
         playerView.load(withVideoId: videoId, playerVars: [
             "playsinline": 1,
-            "autoplay": 1,
-            "controls": 1
+            "autoplay": 1
         ])
+
     }
 }

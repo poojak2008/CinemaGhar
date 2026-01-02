@@ -7,9 +7,13 @@
 
 import UIKit
 
+protocol SearchResultViewControllerDelegate: AnyObject {
+    func searchResultViewControllerDidSelectTitle(_ viewModel: TitlePreviewViewModel)
+}
 class SearchResultViewController: UIViewController {
 
     var titles : [Titles] = [Titles]()
+    weak var delegate: SearchResultViewControllerDelegate?
     
      let searchResultCollectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -51,6 +55,34 @@ extension SearchResultViewController : UICollectionViewDataSource{
         cell.congfigure(with: title.poster_path ?? "hello")
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        collectionView.deselectItem(at: indexPath, animated: true)
+
+        let title = titles[indexPath.row]
+        let titleName = title.original_title ?? title.original_name ?? ""
+
+        APICaller.shared.getMoviesTrailer(with: titleName) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let videoElement):
+
+                    let viewModel = TitlePreviewViewModel(
+                        title: titleName,
+                        youtubeView: videoElement,
+                        titleOverview: title.overview ?? ""
+                    )
+
+                    self?.delegate?.searchResultViewControllerDidSelectTitle(viewModel)
+
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+
     
     
 }

@@ -21,7 +21,7 @@ class UpcomingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .secondarySystemBackground
-        title = "Upcoming"
+        title = "Trending"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         

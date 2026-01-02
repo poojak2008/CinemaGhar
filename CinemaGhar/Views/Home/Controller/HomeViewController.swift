@@ -36,7 +36,6 @@ class HomeViewController: UIViewController {
         let hederView = HeroHederUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = hederView
         
-        
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

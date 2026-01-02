@@ -16,15 +16,21 @@ class SearchViewController: UIViewController {
         table.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.identifier)
         return table
     }()
-    private let searchController: UISearchController = {
-        let controller = UISearchController(searchResultsController: SearchResultViewController())
+    private let searchResultVC = SearchResultViewController()
+
+    private lazy var searchController: UISearchController = {
+        let resultVC = SearchResultViewController()
+        resultVC.delegate = self 
+
+        let controller = UISearchController(searchResultsController: resultVC)
         controller.searchBar.placeholder = "Search"
         controller.searchBar.searchBarStyle = .minimal
         return controller
     }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        definesPresentationContext = true
         title = "Search"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always
@@ -34,6 +40,8 @@ class SearchViewController: UIViewController {
         discoverTable.delegate = self
         navigationItem.searchController = searchController
         searchController.searchResultsUpdater = self
+       
+        
         fetchDiscoverMovies()
         
     }
@@ -77,6 +85,35 @@ extension SearchViewController : UITableViewDataSource{
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        let title = titles[indexPath.row]
+        let titleName = title.original_title ?? title.original_name ?? ""
+
+        APICaller.shared.getMoviesTrailer(with: titleName) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let videoElement):
+                    let viewModel = TitlePreviewViewModel(
+                        title: titleName,
+                        youtubeView: videoElement,
+                        titleOverview: title.overview ?? ""
+                    )
+                    let vc = TitlePreviewViewController()
+                    vc.configure(with: viewModel)
+                    
+                    //Push the view controller
+                    self?.navigationController?.pushViewController(vc, animated: true)
+
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+
     
 }
 extension SearchViewController : UITableViewDelegate{
@@ -110,5 +147,15 @@ extension SearchViewController : UISearchResultsUpdating{
             }
         }
     }
-    
+}
+
+extension SearchViewController: SearchResultViewControllerDelegate {
+    func searchResultViewControllerDidSelectTitle(_ viewModel: TitlePreviewViewModel) {
+
+        searchController.dismiss(animated: true) {   
+            let vc = TitlePreviewViewController()
+            vc.configure(with: viewModel)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
 }

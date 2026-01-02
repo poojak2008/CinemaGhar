@@ -16,14 +16,14 @@ class UpcomingTableViewCell: UITableViewCell {
         let button = UIButton()
         let image = UIImage(systemName:"play.circle",withConfiguration: UIImage.SymbolConfiguration(pointSize: 30) )
         button.setImage(image, for: .normal)
-        button.tintColor = .white
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .white
+        label.textColor = .label
         label.font = .systemFont(ofSize: 17, weight: .semibold)
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
