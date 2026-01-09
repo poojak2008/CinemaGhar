@@ -78,7 +78,7 @@ class TitlePreviewViewController: UIViewController {
         overviewLabel.text = model.titleOverview
 
         guard let videoId = model.youtubeView.id.videoId else {
-            print("❌ videoId missing")
+            print("videoId missing")
             return
         }
 

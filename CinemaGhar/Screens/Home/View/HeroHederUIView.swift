@@ -21,7 +21,7 @@ class HeroHederUIView: UIView {
     private let playButton: UIButton = {
        let button = UIButton()
         button.setTitle("Play", for: .normal)
-        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.borderColor = UIColor.label.cgColor
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 5
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -31,7 +31,7 @@ class HeroHederUIView: UIView {
     private let downlodButton: UIButton = {
         let button = UIButton()
         button.setTitle("Download", for: .normal)
-        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.borderColor = UIColor.label.cgColor
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 5
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -50,7 +50,7 @@ class HeroHederUIView: UIView {
         addSubview(heroImageView)
         addSubview(playButton)
         addSubview(downlodButton)
-        addGradient()
+        //addGradient()
         applyConstraints()
         
 

@@ -18,6 +18,7 @@ enum Sections: Int{
 class HomeViewController: UIViewController {
 
     let sectionTitle : [String] = ["Trending Movie","Trending TV" ,"Populer","Upcoming Moview","Top Rated"]
+    
     private let homeFeedTable: UITableView = {
         let table = UITableView(frame: .zero,style: .grouped)
         table.register(CollectionViewTableViewCell.self, forCellReuseIdentifier: CollectionViewTableViewCell.identifier)
@@ -41,6 +42,7 @@ class HomeViewController: UIViewController {
         super.viewDidLayoutSubviews()
         homeFeedTable.frame = view.bounds
         
+        
     }
     
     private func configureNavBar() {
@@ -62,7 +64,7 @@ class HomeViewController: UIViewController {
             UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil),
             UIBarButtonItem(image: UIImage(systemName: "play.rectangle"), style: .done, target: self, action: nil)
         ]
-        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.tintColor = .label
     }
 
 }
@@ -90,7 +92,7 @@ extension HomeViewController: UITableViewDataSource{
         }
         header.textLabel?.font = .systemFont(ofSize: 15 , weight: .semibold)
         header.textLabel?.frame = CGRect(x: Int(header.bounds.origin.x) + 20, y: Int(header.bounds.origin.y), width: 100, height: Int(header.bounds.height))
-        header.textLabel?.textColor = .white
+        header.textLabel?.textColor = .label
         header.textLabel?.text = header.textLabel?.text?.capitalaizedFirstLetter()
     }
     

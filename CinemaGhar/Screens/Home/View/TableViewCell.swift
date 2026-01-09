@@ -3,7 +3,6 @@
 //  CinemaGhar
 //
 //  Created by pooja kamble on 10/12/25.
-//
 
 import UIKit
 
