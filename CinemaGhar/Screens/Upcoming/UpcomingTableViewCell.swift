@@ -10,25 +10,9 @@ import SDWebImage
 
 class UpcomingTableViewCell: UITableViewCell {
 
-    static let identifier = "TitleTableViewCell"
-    
-    private let playTitleButton: UIButton = {
-        let button = UIButton()
-        let image = UIImage(systemName:"play.circle",withConfiguration: UIImage.SymbolConfiguration(pointSize: 30) )
-        button.setImage(image, for: .normal)
-        button.tintColor = .label
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
-        return label
-    }()
+    static let identifier = "UpcomingTableViewCell"
+
+    // MARK: - UI Components
 
     private let titlesPosterImages: UIImageView = {
         let imageView = UIImageView()
@@ -38,49 +22,88 @@ class UpcomingTableViewCell: UITableViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 17, weight: .semibold)
+        label.numberOfLines = 2
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let overviewLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .secondaryLabel
+        label.font = .systemFont(ofSize: 14)
+        label.numberOfLines = 2
+        label.lineBreakMode = .byTruncatingTail
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let ratingLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .systemYellow
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    // MARK: - Init
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(titleLabel)
+
         contentView.addSubview(titlesPosterImages)
-        contentView.addSubview(playTitleButton)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(overviewLabel)
+        contentView.addSubview(ratingLabel)
+
         applyConstraints()
     }
-    
-    private func applyConstraints() {
-        NSLayoutConstraint.activate([
 
-            // Poster
-            titlesPosterImages.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            titlesPosterImages.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            titlesPosterImages.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-            titlesPosterImages.widthAnchor.constraint(equalToConstant: 100),
-
-            // Play button (NEVER SHRINKS)
-            playTitleButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            playTitleButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            playTitleButton.widthAnchor.constraint(equalToConstant: 32),
-            playTitleButton.heightAnchor.constraint(equalToConstant: 32),
-
-            // Title label (CAN WRAP)
-            titleLabel.leadingAnchor.constraint(equalTo: titlesPosterImages.trailingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: playTitleButton.leadingAnchor, constant: -12),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-
-        ])
-    }
-
-    
-    public func configure(with model: TitleViewModel){
-        guard let url = URL(string: "https://image.tmdb.org/t/p/w500/\(model.posterURL)") else {
-            return
-        }
-        titlesPosterImages.sd_setImage(with: url, completed: nil)
-        titleLabel.text = model.title
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    // MARK: - Constraints
+
+    private func applyConstraints() {
+        NSLayoutConstraint.activate([
+
+            // Poster Image
+            titlesPosterImages.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            titlesPosterImages.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            titlesPosterImages.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            titlesPosterImages.widthAnchor.constraint(equalToConstant: 100),
+
+            // Title
+            titleLabel.topAnchor.constraint(equalTo: titlesPosterImages.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: titlesPosterImages.trailingAnchor, constant: 15),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
+
+            // Overview
+            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            overviewLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            overviewLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+
+            // Rating
+            ratingLabel.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 8),
+            ratingLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor)
+        ])
+    }
+
+    // MARK: - Configure
+
+    public func configure(with model: TitleViewModel) {
+
+        if let url = URL(string: "https://image.tmdb.org/t/p/w500\(model.posterURL)") {
+            titlesPosterImages.sd_setImage(with: url)
+        }
+
+        titleLabel.text = model.title
+        overviewLabel.text = model.overview
+        ratingLabel.text = "⭐ \(String(format: "%.1f", model.voteAverage)) / 10"
+    }
 }

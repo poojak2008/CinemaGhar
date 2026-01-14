@@ -7,7 +7,11 @@
 import UIKit
 
 protocol CollectionViewTableViewCellDelegates: AnyObject {
-    func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel)
+    func collectionViewTableViewCellDidTapCell(
+        _ cell: CollectionViewTableViewCell,
+        viewModel: TitlePreviewViewModel,
+        title: Titles
+    )
 }
 class CollectionViewTableViewCell: UITableViewCell {
 
@@ -70,6 +74,7 @@ extension CollectionViewTableViewCell: UICollectionViewDataSource{
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
         collectionView.deselectItem(at: indexPath, animated: true)
         
         let selectedTitle = title[indexPath.row]
@@ -79,22 +84,25 @@ extension CollectionViewTableViewCell: UICollectionViewDataSource{
         }
         
         APICaller.shared.getMoviesTrailer(with: titleName + " trailer") { [weak self] result in
-            
-            switch result {
-            case .success(let videoElement):
-                
-                let title = self?.title[indexPath.row]
-                                guard let titleOverview = title?.overview else {
-                                    return
-                                }
-                                guard let strongSelf = self else {
-                                    return
-                                }
-                                let viewModel = TitlePreviewViewModel(title: titleName, youtubeView: videoElement, titleOverview: titleOverview)
-                                self?.delegate?.collectionViewTableViewCellDidTapCell(strongSelf, viewModel: viewModel)
-                
-            case .failure(let error):
-                print(error.localizedDescription)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let videoElement):
+                    
+                    guard let self = self else { return }
+                    
+                    let viewModel = TitlePreviewViewModel(
+                        title: titleName,
+                        titleOverview: selectedTitle.overview ?? "",
+                        youtubeView: videoElement,
+                        rating: selectedTitle.vote_average,
+                        isFavourite: false
+                    )
+                    
+                    self.delegate?.collectionViewTableViewCellDidTapCell(self, viewModel: viewModel, title: selectedTitle)
+                    
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
             }
         }
     }

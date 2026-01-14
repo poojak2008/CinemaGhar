@@ -58,14 +58,28 @@ extension UpcomingViewController : UITableViewDataSource{
         return titles.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: UpcomingTableViewCell.identifier, for: indexPath) as? UpcomingTableViewCell else{
-            return UITableViewCell()
-        }
-        let title = titles[indexPath.row]
-        cell.configure(with: TitleViewModel(title: title.original_title ?? "Unown" , posterURL: title.poster_path!))
-        return cell
-    }
+    func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
+           guard let cell = tableView.dequeueReusableCell(
+               withIdentifier: UpcomingTableViewCell.identifier,
+               for: indexPath
+           ) as? UpcomingTableViewCell else {
+               return UITableViewCell()
+           }
+
+           let title = titles[indexPath.row]
+
+           let viewModel = TitleViewModel(
+               title: title.original_title ?? title.original_name ?? "Unknown",
+               posterURL: title.poster_path ?? "",
+               overview: title.overview ?? "No overview available.",
+               voteAverage: title.vote_average
+           )
+
+           cell.configure(with: viewModel)
+           return cell
+       }
     
     
 }

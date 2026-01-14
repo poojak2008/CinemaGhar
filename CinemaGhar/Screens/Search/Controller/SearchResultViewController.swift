@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SearchResultViewControllerDelegate: AnyObject {
-    func searchResultViewControllerDidSelectTitle(_ viewModel: TitlePreviewViewModel)
+    func searchResultViewControllerDidSelectTitle(_ viewModel: TitlePreviewViewModel, titles: Titles)
 }
 class SearchResultViewController: UIViewController {
 
@@ -57,34 +57,33 @@ extension SearchResultViewController : UICollectionViewDataSource{
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
+        
         collectionView.deselectItem(at: indexPath, animated: true)
-
+        
         let title = titles[indexPath.row]
         let titleName = title.original_title ?? title.original_name ?? ""
-
+        
         APICaller.shared.getMoviesTrailer(with: titleName) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let videoElement):
-
+                    
                     let viewModel = TitlePreviewViewModel(
                         title: titleName,
+                        titleOverview: title.overview ?? "",
                         youtubeView: videoElement,
-                        titleOverview: title.overview ?? ""
+                        rating: title.vote_average,
+                        isFavourite: false // default
                     )
-
-                    self?.delegate?.searchResultViewControllerDidSelectTitle(viewModel)
-
+                    
+                    self?.delegate?.searchResultViewControllerDidSelectTitle(viewModel, titles: title)
+                    
                 case .failure(let error):
                     print(error.localizedDescription)
                 }
             }
         }
     }
-
-    
-    
 }
 extension SearchResultViewController : UICollectionViewDelegate{
     

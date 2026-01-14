@@ -9,81 +9,185 @@ import UIKit
 
 class HeroHederUIView: UIView {
 
-    
-    private let heroImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "HeroImage")
-        return imageView
-    }()
+    private var titles: [Titles] = []
+    private var timer: Timer?
+    private var currentIndex = 0
     
     private let playButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton(type: .system)
         button.setTitle("Play", for: .normal)
-        button.layer.borderColor = UIColor.label.cgColor
+        button.setTitleColor(.label, for: .normal)
         button.layer.borderWidth = 1
-        button.layer.cornerRadius = 5
+        button.layer.borderColor = UIColor.label.cgColor
+        button.layer.cornerRadius = 6
+        button.backgroundColor = .clear
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
-    private let downlodButton: UIButton = {
-        let button = UIButton()
+
+    private let downloadButton: UIButton = {
+        let button = UIButton(type: .system)
         button.setTitle("Download", for: .normal)
-        button.layer.borderColor = UIColor.label.cgColor
+        button.setTitleColor(.label, for: .normal)
         button.layer.borderWidth = 1
-        button.layer.cornerRadius = 5
+        button.layer.borderColor = UIColor.label.cgColor
+        button.layer.cornerRadius = 6
+        button.backgroundColor = .clear
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
-    private func addGradient(){
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor.clear.cgColor,
-                                UIColor.systemBackground.cgColor]
-        gradientLayer.frame = bounds
-        layer.addSublayer(gradientLayer)
-    }
-    override init(frame: CGRect){
+
+
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0
+
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.isPagingEnabled = true
+        cv.showsHorizontalScrollIndicator = false
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
+    }()
+
+    override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(heroImageView)
-        addSubview(playButton)
-        addSubview(downlodButton)
-        //addGradient()
-        applyConstraints()
-        
 
-        
-     
+        addSubview(collectionView)
+        collectionView.frame = bounds
+
+        collectionView.register(
+            HeroPosterCollectionViewCell.self,
+            forCellWithReuseIdentifier: HeroPosterCollectionViewCell.identifier
+        )
+
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        addButtons()
+        updateButtonBorderColors()
     }
-    
-    private func applyConstraints() {
 
-        let stack = UIStackView(arrangedSubviews: [playButton, downlodButton])
+    private func addButtons() {
+        let stack = UIStackView(arrangedSubviews: [playButton, downloadButton])
         stack.axis = .horizontal
+        stack.spacing = 16
         stack.distribution = .fillEqually
-        stack.spacing = 20
         stack.translatesAutoresizingMaskIntoConstraints = false
+
         addSubview(stack)
 
         NSLayoutConstraint.activate([
             stack.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50),
-            stack.widthAnchor.constraint(equalToConstant: 260), 
-            stack.heightAnchor.constraint(equalToConstant: 40)
+            stack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -60),
+            stack.widthAnchor.constraint(equalToConstant: 260),
+            stack.heightAnchor.constraint(equalToConstant: 44)
         ])
+    }
+
+    private func updateButtonBorderColors() {
+        let color = UIColor.label.cgColor
+        playButton.layer.borderColor = color
+        downloadButton.layer.borderColor = color
+    }
+
+    
+    required init?(coder: NSCoder) {
+        fatalError()
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        heroImageView.frame = bounds
-        
-        
+        collectionView.frame = bounds
+        collectionView.collectionViewLayout.invalidateLayout()
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateButtonBorderColors()
+        }
+    }
+
+
+    // 🔥 Configure with API data
+    func configure(with titles: [Titles]) {
+        self.titles = titles
+        collectionView.reloadData()
+        startAutoScroll()
+    }
+
+    private func startAutoScroll() {
+        timer?.invalidate()
+
+        timer = Timer.scheduledTimer(
+            timeInterval: 6,
+            target: self,
+            selector: #selector(autoScroll),
+            userInfo: nil,
+            repeats: true
+        )
+    }
+
+    @objc private func autoScroll() {
+        guard titles.count > 1 else { return }
+
+        currentIndex += 1
+
+        if currentIndex >= titles.count {
+            currentIndex = 0
+            collectionView.scrollToItem(
+                at: IndexPath(item: 0, section: 0),
+                at: .left,
+                animated: false
+            )
+        } else {
+            collectionView.scrollToItem(
+                at: IndexPath(item: currentIndex, section: 0),
+                at: .centeredHorizontally,
+                animated: true
+            )
+        }
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        timer?.invalidate()
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        startAutoScroll()
+    }
+
+}
+
+extension HeroHederUIView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+    func collectionView(_ collectionView: UICollectionView,
+                        numberOfItemsInSection section: Int) -> Int {
+        return titles.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: HeroPosterCollectionViewCell.identifier,
+            for: indexPath
+        ) as? HeroPosterCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+
+        if let poster = titles[indexPath.item].poster_path {
+            cell.configure(with: poster)
+        }
+
+        return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize( width: collectionView.bounds.width,
+                       height: collectionView.bounds.height)
     }
     
 }

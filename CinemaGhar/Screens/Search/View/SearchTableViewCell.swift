@@ -8,81 +8,103 @@
 import UIKit
 import SDWebImage
 
-
 class SearchTableViewCell: UITableViewCell {
 
     static let identifier = "SearchTableViewCell"
-    
 
-    private let playTitleButton: UIButton = {
-        let button = UIButton()
-        let image = UIImage(systemName:"play.circle",withConfiguration: UIImage.SymbolConfiguration(pointSize: 30) )
-        button.setImage(image, for: .normal)
-        button.tintColor = .label
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    // MARK: - UI Components
+
+    private let posterImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        iv.layer.cornerRadius = 8
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .label
         label.font = .systemFont(ofSize: 17, weight: .semibold)
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
+        label.textColor = .label
+        label.numberOfLines = 2
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
-    private let titlesPosterImages: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 8
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
+    private let overviewLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 3
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    
+
+    private let ratingLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 13, weight: .medium)
+        label.textColor = .systemYellow
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    // MARK: - Init
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        contentView.addSubview(posterImageView)
         contentView.addSubview(titleLabel)
-        contentView.addSubview(titlesPosterImages)
-        contentView.addSubview(playTitleButton)
+        contentView.addSubview(overviewLabel)
+        contentView.addSubview(ratingLabel)
+
         applyConstraints()
     }
-    
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Constraints
+
     private func applyConstraints() {
         NSLayoutConstraint.activate([
 
             // Poster
-            titlesPosterImages.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            titlesPosterImages.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            titlesPosterImages.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-            titlesPosterImages.widthAnchor.constraint(equalToConstant: 100),
+            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            posterImageView.widthAnchor.constraint(equalToConstant: 90),
 
-            // Play button (NEVER SHRINKS)
-            playTitleButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            playTitleButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            playTitleButton.widthAnchor.constraint(equalToConstant: 32),
-            playTitleButton.heightAnchor.constraint(equalToConstant: 32),
+            // Title
+            titleLabel.topAnchor.constraint(equalTo: posterImageView.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
 
-            // Title label (CAN WRAP)
-            titleLabel.leadingAnchor.constraint(equalTo: titlesPosterImages.trailingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: playTitleButton.leadingAnchor, constant: -12),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            // Overview
+            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            overviewLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            overviewLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
 
+            // Rating
+            ratingLabel.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 6),
+            ratingLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            ratingLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
         ])
     }
 
-    
-    public func configure(with model: TitleViewModel){
-        guard let url = URL(string: "https://image.tmdb.org/t/p/w500/\(model.posterURL)") else {
-            return
-        }
-        titlesPosterImages.sd_setImage(with: url, completed: nil)
+    // MARK: - Configure
+
+    func configure(with model: TitleViewModel) {
+
         titleLabel.text = model.title
+        overviewLabel.text = model.overview
+        ratingLabel.text = "⭐ \(String(format: "%.1f", model.voteAverage)) / 10"
+
+        let urlString = "https://image.tmdb.org/t/p/w500\(model.posterURL)"
+        if let url = URL(string: urlString) {
+            posterImageView.sd_setImage(with: url)
+        }
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }

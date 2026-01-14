@@ -17,6 +17,7 @@ enum Sections: Int{
 
 class HomeViewController: UIViewController {
 
+    var titles: [Titles] = [Titles]()
     let sectionTitle : [String] = ["Trending Movie","Trending TV" ,"Populer","Upcoming Moview","Top Rated"]
     
     private let homeFeedTable: UITableView = {
@@ -34,9 +35,8 @@ class HomeViewController: UIViewController {
         homeFeedTable.dataSource = self
         
         configureNavBar()
-        let hederView = HeroHederUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
-        homeFeedTable.tableHeaderView = hederView
-        
+        setupHeaderView()
+
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -44,6 +44,42 @@ class HomeViewController: UIViewController {
         
         
     }
+    private func setupHeaderView() {
+        let headerView = HeroHederUIView(
+            frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 500)
+        )
+
+        homeFeedTable.tableHeaderView = headerView
+
+        APICaller.shared.getTrendingMovies { result in
+            switch result {
+            case .success(let titles):
+                DispatchQueue.main.async {
+                    headerView.configure(with: Array(titles.prefix(5)))
+                    self.updateHeaderViewHeight()
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    private func updateHeaderViewHeight() {
+        guard let header = homeFeedTable.tableHeaderView else { return }
+        header.setNeedsLayout()
+        header.layoutIfNeeded()
+
+        let height = header.systemLayoutSizeFitting(
+            UIView.layoutFittingCompressedSize
+        ).height
+
+        var frame = header.frame
+        frame.size.height = max(height, 450)
+        header.frame = frame
+
+        homeFeedTable.tableHeaderView = header
+    }
+
     
     private func configureNavBar() {
         // Create a custom view for the left side
@@ -61,8 +97,7 @@ class HomeViewController: UIViewController {
 
         // Right-side icons
         navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil),
-            UIBarButtonItem(image: UIImage(systemName: "play.rectangle"), style: .done, target: self, action: nil)
+            UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil)
         ]
         navigationController?.navigationBar.tintColor = .label
     }
@@ -170,14 +205,17 @@ extension HomeViewController: UITableViewDataSource{
 
  
     
-extension HomeViewController : CollectionViewTableViewCellDelegates {
-    func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewViewModel) {
+extension HomeViewController: CollectionViewTableViewCellDelegates {
+
+    func collectionViewTableViewCellDidTapCell(
+        _ cell: CollectionViewTableViewCell,
+        viewModel: TitlePreviewViewModel,
+        title: Titles
+    ) {
         DispatchQueue.main.async { [weak self] in
             let vc = TitlePreviewViewController()
-            vc.configure(with: viewModel)
+            vc.configure(with: viewModel, title: title) //single Titles
             self?.navigationController?.pushViewController(vc, animated: true)
         }
     }
-    
-    
 }

@@ -9,4 +9,6 @@
 struct TitleViewModel {
     let title: String
     let posterURL: String
+    let overview: String
+    let voteAverage: Double
 }

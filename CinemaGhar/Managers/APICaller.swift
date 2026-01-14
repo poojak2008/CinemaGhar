@@ -99,7 +99,7 @@ class APICaller {
                 return
             }
             
-            do {
+            do   {
                 
                 let result = try JSONDecoder().decode(TrendingTitlesResponse.self, from: data)
                 completion(.success(result.results))            }
