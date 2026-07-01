@@ -23,6 +23,7 @@ class HomeViewController: UIViewController {
     private let homeFeedTable: UITableView = {
         let table = UITableView(frame: .zero,style: .grouped)
         table.register(CollectionViewTableViewCell.self, forCellReuseIdentifier: CollectionViewTableViewCell.identifier)
+        
         return table
     }()
     override func viewDidLoad() {
@@ -47,7 +48,9 @@ class HomeViewController: UIViewController {
     private func setupHeaderView() {
         let headerView = HeroHederUIView(
             frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 500)
+            
         )
+        headerView.delegate = self
 
         homeFeedTable.tableHeaderView = headerView
 
@@ -219,3 +222,31 @@ extension HomeViewController: CollectionViewTableViewCellDelegates {
         }
     }
 }
+
+extension HomeViewController: HeroHeaderUIViewDelegate {
+    func heroHeaderUIViewDidTapItem(_ headerView: HeroHederUIView, title: Titles) {
+        
+        let titleName = title.original_title ?? title.original_name ?? ""
+        
+        APICaller.shared.getMoviesTrailer(with: titleName) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let video):
+                    let viewModel = TitlePreviewViewModel(
+                        title: titleName,
+                        titleOverview: title.overview ?? "",
+                        youtubeView: video,
+                        rating: title.vote_average,
+                        isFavourite: false
+                    )
+                    let vc = TitlePreviewViewController()
+                    vc.configure(with: viewModel, title: title)
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+}
+

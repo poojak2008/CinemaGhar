@@ -8,9 +8,9 @@
 import Foundation
 
 struct Constant {
-    static let API_Key = "6f491cae4b1d6af610dd62264b286dff"
+    static let API_Key = "API key of themociedb"
     static let baseURL = "https://api.themoviedb.org"
-    static let YoutubeAPI_KEY = "AIzaSyBySoAeVL8uyUm-ZIS7Qb7fN-0Ucyp36JI"
+    static let YoutubeAPI_KEY = "API Key of Youtube"
     static let YouTubebseURL = "https://youtube.googleapis.com/youtube/v3/search?"
 }
 
@@ -21,7 +21,6 @@ enum APIError : Error {
 
 class APICaller {
     static let shared = APICaller()
-    
     
     
     func getTrendingMovies(completion: @escaping (Result<[Titles],Error>) -> Void){

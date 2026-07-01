@@ -7,12 +7,18 @@
 
 import UIKit
 
+protocol HeroHeaderUIViewDelegate: AnyObject {
+    func heroHeaderUIViewDidTapItem(_ headerView: HeroHederUIView, title: Titles)
+}
+
+
 class HeroHederUIView: UIView {
 
     private var titles: [Titles] = []
     private var timer: Timer?
     private var currentIndex = 0
     
+    weak var delegate: HeroHeaderUIViewDelegate?
     private let playButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Play", for: .normal)
@@ -63,8 +69,8 @@ class HeroHederUIView: UIView {
 
         collectionView.dataSource = self
         collectionView.delegate = self
-        addButtons()
-        updateButtonBorderColors()
+       // addButtons()
+       // updateButtonBorderColors()
     }
 
     private func addButtons() {
@@ -190,4 +196,9 @@ extension HeroHederUIView: UICollectionViewDataSource, UICollectionViewDelegateF
                        height: collectionView.bounds.height)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let title = titles[indexPath.item]
+        delegate?.heroHeaderUIViewDidTapItem(self, title: title)
+    }
+
 }

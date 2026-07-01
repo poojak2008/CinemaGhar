@@ -51,7 +51,7 @@ class TitlePreviewViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-
+        
         view.addSubview(playerView)
         view.addSubview(titleLabel)
         view.addSubview(overviewLabel)
@@ -64,10 +64,20 @@ class TitlePreviewViewController: UIViewController {
         )
 
         configureConstraints()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.left"),
+            style: .plain,
+            target: self,
+            action: #selector(didTapBack)
+        )
+
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    @objc private func didTapBack() {
+        navigationController?.popViewController(animated: true)
     }
 
 
